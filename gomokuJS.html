@@ -54,10 +54,13 @@ function handleKeyPress(key)
     else if (key.code == 'Space') {
         var x = (left - 3) / 32;
         var y = (bottom - 5) / 32;
+        if (board.occupied(x, y)) {
+            return false;
+        }
         if (DIR == 0) {
             man.go(x, y);
         }
-        else {
+        else if (DIR == 1) {
             machine.go(x, y);
         }
         board.judge(DIR, x, y);

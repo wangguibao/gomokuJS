@@ -2,73 +2,78 @@
  * gomokuJs.js
  *
  */
-
 /*
  * The gomoku Board class
  */
 function Board() {
+    this.DIMENSION = 15;
     this.matrix = new Array(15);
-    for (var i = 0; i < 15; i++) {
+    for (var i = 0; i < 15; i += 1) {
         this.matrix[i] = new Array(15);
         for (var j = 0; j < 15; j++) {
             this.matrix[i][j] = -1;
         }
     }
-};
+}
 
 Board.prototype = {
-	constructor: Board,
+    constructor: Board,
+    occupied: function(x, y) {
+        return !(this.matrix[x][y] == -1);
+    },
+
 	judge: function(op, x, y) {
         if (x >= 15 || y >= 15) {
-            alert('Invalid x or y axis:' + x + ' ' + y);
+            window.alert('Invalid x or y axis:' + x + ' ' + y);
             return -1;
         }
         this.matrix[x][y] = op;
 
+        var chain = 0;
+        var i = 0;
+        var j = 0;
+        var win = false;
         // chain of left-right
-        var minx = min(x - 4, 0);
-        for (var i = minx; i < x; ++i) {
-            var chain = 0;
-            var win = false;
-            for (var j = i + 1; j < i + 5; ++j) {
-                if (this.matrix[i][j] == op) {
-                    chain++;
-                    if (chain == 5) {
-                        win = true;
-                        break;
-                    }
-                }
-                else {
+        for (i = Math.max(x - 4, 0); i <= Math.min(x, this.DIMENSION - 5); ++i) {
+            chain = 0;
+            win = false;
+            for (j = i; j < i + 5; ++j) {
+                if (this.matrix[j][y] != op) {
                     break;
                 }
+                chain++;
             }
-            if (win == true) {
-                break;
+            if (chain == 5) {
+                win = true;
+                window.alert('You win');
+                return 0;
             }
         }
-
         // chain of up-down
-        var miny = min(y - 4, 0);
-        for (var i = miny; i < y; ++i) {
-            var chain = 0;
-            var win = false;
-            for (var j = i + 1; j < i + 5; ++j) {
-                if (this.matrix[i][j] == op) {
-                    chain++;
-                    if (chain == 5) {
-                        win = true;
-                        break;
-                    }
-                }
-                else {
+        for (i = Math.max(y - 4, 0); i <= Math.min(y, this.DIMENSION - 5); ++i) {
+            chain = 0;
+            win = false;
+            for (j = i; j < i + 5; ++j) {
+                if (this.matrix[x][j] != op) {
                     break;
                 }
+                chain++;
             }
-            if (win == true) {
-                break;
+            if (chain == 5) {
+                win = true;
+                window.alert('You win');
+                return 0;
             }
         }
 
+        // chain of bottomleft-upright
+        // for (i = Math.max(x - 4, 0); i <= Math.min(x, this.DIMENSION - 5); ++i) {
+        //    chain = 0;
+        //    win = false;
+        //    for (j = i;j < i + 5; ++j) {
+        //        if (matrix[][])
+        //    }
+        // }
     }
 };
 
@@ -77,7 +82,7 @@ function Player (color) {
         return null;
     }
     this.color = color;
-};
+}
 
 Player.prototype = {
     constructor: Player,
@@ -95,4 +100,4 @@ Player.prototype = {
         piece.style.left = x * 32 + 3 + 'px';
         piece.style.bottom = y * 32 + 5 + 'px';
     }
-};
+}
