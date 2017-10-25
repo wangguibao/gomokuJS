@@ -1,0 +1,81 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN">
+<html lang="en">
+<head>
+    <title>Gomoku (since 2017)</title>
+    <link rel="stylesheet" type="text/css" href="gomokuJS.css"/>
+    <script type="text/javascript" src="gomokuJS.js"></script>
+</head>
+<body>
+    <div>
+        <div id="main">
+            <img id ='board' src='images/board.png'></img>
+            <img id='pointer' src='images/pointer.png'></img>
+        </div>
+    </div>
+<script>
+var man = new Player('black');
+var machine = new Player('white');
+var board = new Board();
+var DIR = 0;
+
+function handleKeyPress(key)
+{
+    var pointer = document.getElementById('pointer');
+    var background = document.getElementById('board');
+    var backgroundHeight = background.offsetHeight;
+    var backgroundWidth = background.offsetWidth;
+    
+    var left = parseInt(pointer.style.left);
+    var bottom = parseInt(pointer.style.bottom);
+    if (key.code == 'ArrowUp') {
+        if (bottom + 32 < backgroundHeight) {
+            bottom += 32;
+        }
+        pointer.style.bottom = bottom + 'px';
+    }
+    else if (key.code == 'ArrowDown') {
+        if (bottom - 32 >= 5) {
+            bottom -= 32;
+        }
+        pointer.style.bottom = bottom + 'px';
+    }
+    else if (key.code == 'ArrowLeft') {
+        if (left - 32 >= 3) {
+            left -= 32;
+        }
+        pointer.style.left = left + 'px';
+    }
+    else if (key.code == 'ArrowRight') {
+        if (left + 32 < backgroundWidth) {
+            left += 32;
+        }
+        pointer.style.left = left + 'px';
+    }
+    else if (key.code == 'Space') {
+        var x = (left - 3) / 32;
+        var y = (bottom - 5) / 32;
+        if (DIR == 0) {
+            man.go(x, y);
+        }
+        else {
+            machine.go(x, y);
+        }
+        board.judge(DIR, x, y);
+        DIR = !DIR;
+    }
+    
+    return false;
+}
+
+function main()
+{
+    var pointer = document.getElementById('pointer');
+    pointer.style.left = '3px';
+    pointer.style.bottom = '5px';
+
+    document.body.addEventListener('keydown', handleKeyPress);
+}
+main();
+</script>
+</body>
+</html>

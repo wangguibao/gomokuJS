@@ -1,0 +1,19 @@
+body {
+    margin: 0;
+    padding: 0;
+    background: #000000;
+    height: 100%;
+    width: 100%;
+}
+
+#main {
+    background: #000000;
+    position: absolute;
+    left: 100px;
+}
+
+#pointer {
+    position: absolute;
+    bottom: 3px;
+    left: 3px;
+}
