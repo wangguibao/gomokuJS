@@ -8,8 +8,9 @@
 <body>
     <div>
         <div id="main">
-            <img id ='board' src='images/board.png'></img>
+            <img id='board' src='images/board.png'></img>
             <img id='pointer' src='images/pointer.png'></img>
+            <span id='win'></span>
         </div>
     </div>
 <script>
@@ -17,6 +18,40 @@ var man = new Player('black');
 var machine = new Player('white');
 var board = new Board();
 var DIR = 0;
+
+function win(dir, reason)
+{
+    // window.alert(dir == 0 ? 'Black wins' : 'White wins');
+    var span = document.querySelector('#win');
+    var winner = dir == 0 ? 'Black' : 'White';
+    span.textContent = winner + ' wins';
+    span.style.display = 'inline';
+    span.style.position = 'absolute';
+    span.style.left = span.parentElement.offsetWidth / 3 + 'px';
+    span.style.bottom = span.parentElement.offsetHeight * 2 / 3 + 'px';
+}
+
+function lose(dir, error)
+{
+    var reason = "";
+    switch (error) {
+    case GLOBAL.boardStatus.PARAM_ERROR:
+        reason = "Parameter error";
+        break;
+    case GLOBAL.boardStatus.FORBIDDEN_LONG_CHAIN:
+        reason = "Long chain";
+        break;
+    case GLOBAL.boardStatus.FORBIDDEN_3_3:
+        reason = "3-3 forbidden";
+        break;
+    case GLOBAL.boardStatus.FORBIDDEN_4_4:
+        reason = "4-4 forbidden";
+        break;
+    default:
+        break;
+    }
+    window.alert((dir == 0 ? 'Black lose: ' : 'White lose: ') + reason);
+}
 
 function handleKeyPress(key)
 {
@@ -63,7 +98,13 @@ function handleKeyPress(key)
         else if (DIR == 1) {
             machine.go(x, y);
         }
-        board.judge(DIR, x, y);
+        var ret = board.judge(DIR, x, y);
+        if (ret == GLOBAL.boardStatus.WIN) {
+            win(DIR);
+        }
+        else if (ret == GLOBAL.boardStatus.FORBIDDEN_LONG_CHAIN) {
+            lose(DIR, ret);
+        }
         DIR = !DIR;
     }
     

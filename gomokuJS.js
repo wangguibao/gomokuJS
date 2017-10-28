@@ -5,6 +5,17 @@
 /*
  * The gomoku Board class
  */
+var GLOBAL = {
+    boardStatus: {
+                    UNDETERMINED: 0,
+                    WIN: 1,
+                    PARAM_ERROR: -1,
+                    FORBIDDEN_LONG_CHAIN: -2,
+                    FORBIDDEN_3_3: -3,
+                    FORBIDDEN_4_4: -4
+    }
+};
+
 function Board() {
     this.DIMENSION = 15;
     this.UNOCCUPIED = -1;
@@ -26,7 +37,7 @@ Board.prototype = {
 	judge: function(op, x, y) {
         if (x >= 15 || y >= 15) {
             window.alert('Invalid x or y axis:' + x + ' ' + y);
-            return -1;
+            return GLOBAL.boardStatus.PARAM_ERROR;
         }
         this.matrix[x][y] = op;
 
@@ -51,15 +62,10 @@ Board.prototype = {
             maxChain = chain;
         }
         if (maxChain == 5) {
-            win = true;
-            window.alert('You win');
-            return 0;
+            return GLOBAL.boardStatus.WIN;
         }
         else if (maxChain > 5) {
-            forbidden = true;
-            window.alert('Forbidden');
-            win = false;
-            return 0;
+            return GLOBAL.boardStatus.FORBIDDEN_LONG_CHAIN;
         }
 
         // chain of up-down
@@ -80,15 +86,10 @@ Board.prototype = {
             maxChain = chain;
         }
         if (maxChain == 5) {
-            win = true;
-            window.alert('You win');
-            return 0;
+            return GLOBAL.boardStatus.WIN;
         }
         else if (maxChain > 5) {
-            forbidden = true;
-            window.alert('Forbidden');
-            win = false;
-            return 0;
+            return GLOBAL.boardStatus.FORBIDDEN_LONG_CHAIN;
         }
 
         // chain of bottomleft-upright
@@ -113,15 +114,10 @@ Board.prototype = {
             maxChain = chain;
         }
         if (maxChain == 5) {
-            win = true;
-            window.alert('You win');
-            return 0;
+            return GLOBAL.boardStatus.WIN;
         }
         else if (maxChain > 5) {
-            forbidden = true;
-            window.alert('Forbidden');
-            win = false;
-            return 0;
+            return GLOBAL.boardStatus.FORBIDDEN_LONG_CHAIN;
         }
 
         // chain of bottomright-upleft
@@ -143,15 +139,10 @@ Board.prototype = {
             maxChain = chain;
         }
         if (maxChain == 5) {
-            win = true;
-            window.alert('You win');
-            return 0;
+            return GLOBAL.boardStatus.WIN;
         }
         else if (maxChain > 5) {
-            forbidden = true;
-            window.alert('Forbidden');
-            win = false;
-            return 0;
+            return GLOBAL.boardStatus.FORBIDDEN_LONG_CHAIN;
         }
     }
 };
