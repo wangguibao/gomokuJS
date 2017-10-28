@@ -12,7 +12,7 @@ function Board() {
     for (var i = 0; i < 15; i += 1) {
         this.matrix[i] = new Array(15);
         for (var j = 0; j < 15; j++) {
-            this.matrix[i][j] = UNOCCUPIED;
+            this.matrix[i][j] = this.UNOCCUPIED;
         }
     }
 }
@@ -35,6 +35,7 @@ Board.prototype = {
         var i = 0;
         var j = 0;
         var win = false;
+        var forbidden = false;
         // chain of left-right
         for (i = Math.max(x - 5, 0); i <= Math.min(x + 5, this.DIMENSION - 1); ++i) {
             if (this.matrix[i][y] != op) {
@@ -52,6 +53,12 @@ Board.prototype = {
         if (maxChain == 5) {
             win = true;
             window.alert('You win');
+            return 0;
+        }
+        else if (maxChain > 5) {
+            forbidden = true;
+            window.alert('Forbidden');
+            win = false;
             return 0;
         }
 
@@ -75,6 +82,12 @@ Board.prototype = {
         if (maxChain == 5) {
             win = true;
             window.alert('You win');
+            return 0;
+        }
+        else if (maxChain > 5) {
+            forbidden = true;
+            window.alert('Forbidden');
+            win = false;
             return 0;
         }
 
@@ -104,6 +117,12 @@ Board.prototype = {
             window.alert('You win');
             return 0;
         }
+        else if (maxChain > 5) {
+            forbidden = true;
+            window.alert('Forbidden');
+            win = false;
+            return 0;
+        }
 
         // chain of bottomright-upleft
         chain = 0;
@@ -126,6 +145,12 @@ Board.prototype = {
         if (maxChain == 5) {
             win = true;
             window.alert('You win');
+            return 0;
+        }
+        else if (maxChain > 5) {
+            forbidden = true;
+            window.alert('Forbidden');
+            win = false;
             return 0;
         }
     }
