@@ -10,21 +10,20 @@
         <div id="main">
             <img id='board' src='images/board.png'></img>
             <img id='pointer' src='images/pointer.png'></img>
-            <span id='win'></span>
+            <span id='gameover'></span>
         </div>
     </div>
 <script>
-var man = new Player('black');
-var machine = new Player('white');
 var board = new Board();
-var DIR = 0;
+var COLOR = GLOBAL.color.BLACK;
+var man = new Player('man');
+var machine = new Player('machine');
 
-function win(dir, reason)
+function win(player, reason)
 {
     // window.alert(dir == 0 ? 'Black wins' : 'White wins');
-    var span = document.querySelector('#win');
-    var winner = dir == 0 ? 'Black' : 'White';
-    span.textContent = winner + ' wins';
+    var span = document.querySelector('#gameover');
+    span.textContent = player + ' wins';
     span.style.display = 'inline';
     span.style.position = 'absolute';
     span.style.left = span.parentElement.offsetWidth / 3 + 'px';
@@ -89,23 +88,26 @@ function handleKeyPress(key)
     else if (key.code == 'Space') {
         var x = (left - 3) / 32;
         var y = (bottom - 5) / 32;
-        if (board.occupied(x, y)) {
+        if (man.go(x, y) != 0) {
             return false;
         }
-        if (DIR == 0) {
-            man.go(x, y);
-        }
-        else if (DIR == 1) {
-            machine.go(x, y);
-        }
-        var ret = board.judge(DIR, x, y);
+        var ret = board.judge(man.color, x, y);
         if (ret == GLOBAL.boardStatus.WIN) {
-            win(DIR);
+            win(man.name);
         }
         else if (ret == GLOBAL.boardStatus.FORBIDDEN_LONG_CHAIN) {
-            lose(DIR, ret);
+            lose(man.name, ret);
         }
-        DIR = !DIR;
+
+        var point = machine.autoMove();
+        ret = board.judge(machine.color, point.x, point.y);
+        if (ret == GLOBAL.boardStatus.WIN) {
+            win(machine.name);
+        }
+        else if (ret == GLOBAL.boardStatus.FORBIDDEN_LONG_CHAIN) {
+            lose(machine.name, ret);
+        }
+        
     }
     
     return false;
@@ -113,6 +115,11 @@ function handleKeyPress(key)
 
 function main()
 {
+    man.setColor(GLOBAL.color.BLACK);
+    man.associateBoard(board);
+
+    machine.setColor(GLOBAL.color.WHITE);
+    machine.associateBoard(board);
     var pointer = document.getElementById('pointer');
     pointer.style.left = '3px';
     pointer.style.bottom = '5px';

@@ -13,8 +13,17 @@ var GLOBAL = {
                     FORBIDDEN_LONG_CHAIN: -2,
                     FORBIDDEN_3_3: -3,
                     FORBIDDEN_4_4: -4
+    },
+    color: {
+        BLACK: 0,
+        WHITE: 1
     }
 };
+
+function Point(x, y) {
+    this.x = x;
+    this.y = y;
+}
 
 function Board() {
     this.DIMENSION = 15;
@@ -33,13 +42,22 @@ Board.prototype = {
     occupied: function(x, y) {
         return !(this.matrix[x][y] == -1);
     },
-
-	judge: function(op, x, y) {
+    put: function(color, x, y) {
         if (x >= 15 || y >= 15) {
             window.alert('Invalid x or y axis:' + x + ' ' + y);
             return GLOBAL.boardStatus.PARAM_ERROR;
         }
-        this.matrix[x][y] = op;
+        if (this.matrix[x][y] != this.UNOCCUPIED) {
+            return -1;
+        }
+        this.matrix[x][y] = color;
+        return 0;
+    },
+	judge: function(color, x, y) {
+        if (x >= 15 || y >= 15) {
+            window.alert('Invalid x or y axis:' + x + ' ' + y);
+            return GLOBAL.boardStatus.PARAM_ERROR;
+        }
 
         var chain = 0;
         var maxChain = 0;
@@ -49,7 +67,7 @@ Board.prototype = {
         var forbidden = false;
         // chain of left-right
         for (i = Math.max(x - 5, 0); i <= Math.min(x + 5, this.DIMENSION - 1); ++i) {
-            if (this.matrix[i][y] != op) {
+            if (this.matrix[i][y] != color) {
                     maxChain = Math.max(chain, maxChain);
                     chain = 0;
             }
@@ -73,7 +91,7 @@ Board.prototype = {
         win = false;
         maxChain = 0;
         for (i = Math.max(y - 5, 0); i <= Math.min(y + 5, this.DIMENSION - 1); ++i) {
-            if (this.matrix[x][i] != op) {
+            if (this.matrix[x][i] != color) {
                 maxChain = Math.max(chain, maxChain);
                 chain = 0;
             }
@@ -101,7 +119,7 @@ Board.prototype = {
             if (j < 0) {
                 continue;
             }
-            if (this.matrix[i][j] != op) {
+            if (this.matrix[i][j] != color) {
                 maxChain = Math.max(chain, maxChain);
                 chain = 0;
             }
@@ -126,7 +144,7 @@ Board.prototype = {
         win = false;
         for (i = Math.max(x - 5, 0); i <= Math.min(x + 5, this.DIMENSION - 1); ++i) {
             j = (x + y) - i;
-            if (this.matrix[i][j] != op) {
+            if (this.matrix[i][j] != color) {
                 maxChain = Math.max(chain, maxChain);
                 chain = 0;
             }
@@ -147,19 +165,26 @@ Board.prototype = {
     }
 };
 
-function Player (color) {
-    if (typeof(color) !== "string") {
-        return null;
-    }
-    this.color = color;
+function Player (name) {
+    this.name = name;
+    this.color = GLOBAL.color.BLACK;
 }
 
 Player.prototype = {
     constructor: Player,
+    setColor: function(color) {
+        this.color = color;
+    },
+    associateBoard: function(board) {
+        this.board = board;
+    },
     go: function(x, y) {
+        if (this.board.put(this.color, x, y) != 0) {
+            return -1;
+        }
         var board = document.getElementById('main');
         var piece = document.createElement('IMG');
-        if (this.color == 'white') {
+        if (this.color == GLOBAL.color.WHITE) {
             piece.setAttribute('src', 'images/white.png');
         }
         else {
@@ -169,5 +194,18 @@ Player.prototype = {
         piece.style.position = 'absolute';
         piece.style.left = x * 32 + 3 + 'px';
         piece.style.bottom = y * 32 + 5 + 'px';
+
+        return 0;
+    },
+    autoMove: function() {
+        while (1) {
+            x = Math.floor(Math.random() * this.board.DIMENSION);
+            y = Math.floor(Math.random() * this.board.DIMENSION);
+            if (!this.board.occupied(x, y)) {
+                break;
+            }
+        }
+        this.go(x, y);
+        return new Point(x, y);
     }
 }
