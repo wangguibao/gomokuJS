@@ -1,6 +1,6 @@
 /*
  * gomokuJs.js
- *
+ * Reference: http://blog.csdn.net/clhmw/article/category/1163342
  */
 /*
  * The gomoku Board class
@@ -177,6 +177,48 @@ Player.prototype = {
     },
     associateBoard: function(board) {
         this.board = board;
+        this.myState = new Array(this.board.DIMENSION);
+        
+        var i = 0;
+        var j = 0;
+        var k = 0;
+           for (i = 0; i < this.board.DIMENSION; ++i) {
+            this.myState[i] = new Array(this.board.DIMENSION);
+            for (j = 0; j < this.board.DIMENSION; ++j) {
+                this.myState[i][j] = new Array(8);
+                for (k = 0; k < 8; ++k) {
+                    this.myState[i][j][k] = new Array(2);
+                    this.myState[i][j][k][0] = this.myState[i][j][k][1] = -1;
+                }
+            }
+        }
+        
+        this.score = new Array(this.board.DIMENSION);
+        for (i = 0; i < this.board.DIMENSION; ++i) {
+            this.score[i] = new Array(this.board.DIMENSION);
+            for (j = 0; j < this.board.DIMENSION; ++j) {
+                this.score[i][j] = new Array(2);
+                this.score[i][j][0] = this.score[i][j][1] = 0;
+            }
+        }
+    },
+    resetState: function() {
+        var i = 0;
+        var j = 0;
+        var k = 0;
+           for (i = 0; i < this.board.DIMENSION; ++i) {
+            for (j = 0; j < this.board.DIMENSION; ++j) {
+                for (k = 0; k < 8; ++k) {
+                    this.myState[i][j][k][0] = this.myState[i][j][k][1] = -1;
+                }
+            }
+        }
+        
+        for (i = 0; i < this.board.DIMENSION; ++i) {
+            for (j = 0; j < this.board.DIMENSION; ++j) {
+                this.score[i][j][0] = this.score[i][j][1] = 0;
+            }
+        }
     },
     go: function(x, y) {
         if (this.board.put(this.color, x, y) != 0) {
@@ -197,6 +239,129 @@ Player.prototype = {
 
         return 0;
     },
+
+    evaluate: function() {
+        this.resetState();
+        // Check each of the 8-directions counter-clockwise
+        // Starting from down, then down-right, then right... till down-left
+        var stepX = [ 0,  1, 1, 1, 0, -1, -1, -1];
+        var stepY = [-1, -1, 0, 1, 1,  1,  0, -1];
+
+        var i = 0;
+        var j = 0;
+        var k = 0;
+        var n = 0;
+        var opponentColor = +(!this.color);
+        // Consequtive pieces with same color / opponent color
+        var curX = 0;
+        var curY = 0;
+        for (i = 0; i < this.board.DIMENSION; ++i) {
+            for (j = 0; j < this.board.DIMENSION; ++j) {
+                if (this.board.matrix[i][j] != this.board.UNOCCUPIED) {
+                    continue;
+                }
+
+                for (k = 0; k < 8; ++k) {
+                    // same color
+                    curX = i;
+                    curY = j;
+                    count = 0;
+                    for (n = 0; n < 5; ++n) {
+                        curX += stepX[k];
+                        curY += stepY[k];
+                        if (curX < 0 || curX >= this.board.DIMENSION || curY < 0 || curY >= this.board.DIMENSION) {
+                            break;
+                        }
+                        if (this.board.matrix[curX][curY] != this.color) {
+                            break;
+                        }
+                        count++;
+                    }
+                    this.myState[i][j][k][this.color] = count;
+
+                    // opponent color
+                    curX = i;
+                    curY = j;
+                    count = 0;
+                    for (n = 0; n < 5; ++n) {
+                        curX += stepX[k];
+                        curY += stepY[k];
+                        if (curX < 0 || curX >= this.board.DIMENSION || curY < 0 || curY >= this.board.DIMENSION) {
+                            break;
+                        }
+                        if (this.board.matrix[curX][curY] != opponentColor) {
+                            break;
+                        }
+                        count++;
+                    }
+                    this.myState[i][j][k][opponentColor] = count;
+                }
+            }
+        }
+
+        // Score
+        var score = 0;
+        for (i = 0; i < this.board.DIMENSION; ++i) {
+            for (j = 0; j < this.board.DIMENSION; ++j) {
+                if (this.board.matrix[i][j] != this.board.UNOCCUPIED) {
+                    continue;
+                }
+
+                score = 0;
+                for (k = 0; k < 4; ++k) {
+                    count = this.myState[i][j][k][this.color] + this.myState[i][j][k + 4][this.color];
+                    if (count >= 4) {
+                        score += 10000;
+                    }
+                    else if (count == 3) {
+                        score += 1000;
+                    }
+                    else if (count == 2) {
+                        score += 100;
+                    }
+                    else if (count == 1) {
+                        score += 10;
+                    }
+                }
+
+                this.score[i][j][this.color] = score;
+
+                score = 0;
+                for (k = 0; k < 4; ++k) {
+                    count = this.myState[i][j][k][opponentColor] + this.myState[i][j][k + 4][opponentColor];
+                    if (count >= 4) {
+                        score += 10000;
+                    }
+                    else if (count == 3) {
+                        score += 1000;
+                    }
+                    else if (count == 2) {
+                        score += 100;
+                    }
+                    else if (count == 1) {
+                        score += 10;
+                    }
+                }
+
+                this.score[i][j][opponentColor] = score;
+            }
+        }
+
+        var selectedX = 0;
+        var selectedY = 0;
+
+        for (i = 0; i < this.board.DIMENSION; ++i) {
+            for (j = 0; j < this.board.DIMENSION; ++j) {
+                var curScore = this.score[selectedX][selectedY][opponentColor];
+                if (curScore < this.score[i][j][opponentColor]) {
+                    selectedX = i;
+                    selectedY = j;
+                }
+            }
+        }
+        return new Point(selectedX, selectedY);
+    },
+
     autoMove: function() {
         while (1) {
             x = Math.floor(Math.random() * this.board.DIMENSION);
@@ -207,5 +372,11 @@ Player.prototype = {
         }
         this.go(x, y);
         return new Point(x, y);
+    },
+
+    defensiveMove: function() {
+        var point = this.evaluate();
+        this.go(point.x, point.y);
+        return point;
     }
 }

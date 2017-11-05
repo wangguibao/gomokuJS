@@ -7,6 +7,7 @@
 </head>
 <body>
     <div>
+        <div id="header"></div>
         <div id="main">
             <img id='board' src='images/board.png'></img>
             <img id='pointer' src='images/pointer.png'></img>
@@ -99,7 +100,7 @@ function handleKeyPress(key)
             lose(man.name, ret);
         }
 
-        var point = machine.autoMove();
+        var point = machine.defensiveMove();
         ret = board.judge(machine.color, point.x, point.y);
         if (ret == GLOBAL.boardStatus.WIN) {
             win(machine.name);
