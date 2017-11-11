@@ -30,4 +30,5 @@ body {
     font-style: bold;
     color: #F0F0F0;
     background-color: #000000;
+    z-index: 1;
 }

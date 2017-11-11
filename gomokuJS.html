@@ -100,7 +100,7 @@ function handleKeyPress(key)
             lose(man.name, ret);
         }
 
-        var point = machine.defensiveMove();
+        var point = machine.defensiveMoveLevel1();
         ret = board.judge(machine.color, point.x, point.y);
         if (ret == GLOBAL.boardStatus.WIN) {
             win(machine.name);

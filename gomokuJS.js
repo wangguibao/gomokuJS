@@ -240,7 +240,7 @@ Player.prototype = {
         return 0;
     },
 
-    evaluate: function() {
+    evaluateLevel1: function() {
         this.resetState();
         // Check each of the 8-directions counter-clockwise
         // Starting from down, then down-right, then right... till down-left
@@ -347,19 +347,33 @@ Player.prototype = {
             }
         }
 
-        var selectedX = 0;
-        var selectedY = 0;
+        var defensivePoint = new Point(0, 0);
+        var offensivePoint = new Point(0, 0);
 
         for (i = 0; i < this.board.DIMENSION; ++i) {
             for (j = 0; j < this.board.DIMENSION; ++j) {
-                var curScore = this.score[selectedX][selectedY][opponentColor];
+                var curScore = this.score[offensivePoint.x][offensivePoint.y][this.color];
+                if (curScore < this.score[i][j][this.color]) {
+                    offensivePoint.x = i;
+                    offensivePoint.y = j;
+                }
+
+                curScore = this.score[defensivePoint.x][defensivePoint.y][opponentColor];
                 if (curScore < this.score[i][j][opponentColor]) {
-                    selectedX = i;
-                    selectedY = j;
+                    defensivePoint.x = i;
+                    defensivePoint.y = j;
                 }
             }
         }
-        return new Point(selectedX, selectedY);
+
+        var offensiveScore = this.score[offensivePoint.x][offensivePoint.y][this.color];
+        var defensiveScore = this.score[defensivePoint.x][defensivePoint.y][opponentColor];
+        if (offensiveScore > defensiveScore) {
+            return offensivePoint;
+        }
+        else {
+            return defensivePoint;
+        }
     },
 
     autoMove: function() {
@@ -374,8 +388,8 @@ Player.prototype = {
         return new Point(x, y);
     },
 
-    defensiveMove: function() {
-        var point = this.evaluate();
+    defensiveMoveLevel1: function() {
+        var point = this.evaluateLevel1();
         this.go(point.x, point.y);
         return point;
     }
