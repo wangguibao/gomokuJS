@@ -269,7 +269,10 @@ Player.prototype = {
                     for (n = 0; n < 5; ++n) {
                         curX += stepX[k];
                         curY += stepY[k];
-                        if (curX < 0 || curX >= this.board.DIMENSION || curY < 0 || curY >= this.board.DIMENSION) {
+                        if (curX < 0
+                                || curX >= this.board.DIMENSION
+                                || curY < 0
+                                || curY >= this.board.DIMENSION) {
                             break;
                         }
                         if (this.board.matrix[curX][curY] != this.color) {
@@ -286,7 +289,10 @@ Player.prototype = {
                     for (n = 0; n < 5; ++n) {
                         curX += stepX[k];
                         curY += stepY[k];
-                        if (curX < 0 || curX >= this.board.DIMENSION || curY < 0 || curY >= this.board.DIMENSION) {
+                        if (curX < 0
+                                || curX >= this.board.DIMENSION
+                                || curY < 0
+                                || curY >= this.board.DIMENSION) {
                             break;
                         }
                         if (this.board.matrix[curX][curY] != opponentColor) {
@@ -309,7 +315,8 @@ Player.prototype = {
 
                 score = 0;
                 for (k = 0; k < 4; ++k) {
-                    count = this.myState[i][j][k][this.color] + this.myState[i][j][k + 4][this.color];
+                    count = this.myState[i][j][k][this.color]
+                                + this.myState[i][j][k + 4][this.color];
                     if (count >= 4) {
                         score += 10000;
                     }
@@ -328,7 +335,8 @@ Player.prototype = {
 
                 score = 0;
                 for (k = 0; k < 4; ++k) {
-                    count = this.myState[i][j][k][opponentColor] + this.myState[i][j][k + 4][opponentColor];
+                    count = this.myState[i][j][k][opponentColor]
+                                + this.myState[i][j][k + 4][opponentColor];
                     if (count >= 4) {
                         score += 10000;
                     }
@@ -352,13 +360,15 @@ Player.prototype = {
 
         for (i = 0; i < this.board.DIMENSION; ++i) {
             for (j = 0; j < this.board.DIMENSION; ++j) {
-                var curScore = this.score[offensivePoint.x][offensivePoint.y][this.color];
+                var curScore
+                        = this.score[offensivePoint.x][offensivePoint.y][this.color];
                 if (curScore < this.score[i][j][this.color]) {
                     offensivePoint.x = i;
                     offensivePoint.y = j;
                 }
 
-                curScore = this.score[defensivePoint.x][defensivePoint.y][opponentColor];
+                curScore
+                        = this.score[defensivePoint.x][defensivePoint.y][opponentColor];
                 if (curScore < this.score[i][j][opponentColor]) {
                     defensivePoint.x = i;
                     defensivePoint.y = j;
@@ -366,12 +376,32 @@ Player.prototype = {
             }
         }
 
-        var offensiveScore = this.score[offensivePoint.x][offensivePoint.y][this.color];
-        var defensiveScore = this.score[defensivePoint.x][defensivePoint.y][opponentColor];
+        var offensiveScore
+                = this.score[offensivePoint.x][offensivePoint.y][this.color];
+        var defensiveScore
+                = this.score[defensivePoint.x][defensivePoint.y][opponentColor];
+
+        msgBox.clear();
+        msgBox.appendMessage('offsiveScore: '
+                            + offensiveScore
+                            + ' at ['
+                            + offensivePoint.x
+                            + ','
+                            + offensivePoint.y
+                            + ']');
+        msgBox.appendMessage('defensiveScore: '
+                            + defensiveScore
+                            + ' at ['
+                            + defensivePoint.x
+                            + ','
+                            + defensivePoint.y
+                            + ']');
         if (offensiveScore > defensiveScore) {
+            msgBox.appendMessage('Selecting offensive point');
             return offensivePoint;
         }
         else {
+            msgBox.appendMessage('Selecting defensive point');
             return defensivePoint;
         }
     },
