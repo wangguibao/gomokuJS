@@ -143,9 +143,10 @@ function main()
     machine.setColor(GLOBAL.color.WHITE);
     machine.associateBoard(board);
     var pointer = document.getElementById('pointer');
-    pointer.style.left = '3px';
-    pointer.style.bottom = '5px';
-
+    var left = 3 + Math.floor(board.DIMENSION / 2) * 32;
+    var bottom = 5 + Math.floor(board.DIMENSION / 2 ) * 32;
+    pointer.style.left = left + 'px';
+    pointer.style.bottom = bottom + 'px';
     document.body.addEventListener('keydown', handleKeyPress);
 }
 main();
