@@ -177,18 +177,30 @@ Player.prototype = {
     },
     associateBoard: function(board) {
         this.board = board;
-        this.myState = new Array(this.board.DIMENSION);
+        this.state = new Array(this.board.DIMENSION);
+        this.bounded = new Array(this.board.DIMENSION);
         
         var i = 0;
         var j = 0;
         var k = 0;
-           for (i = 0; i < this.board.DIMENSION; ++i) {
-            this.myState[i] = new Array(this.board.DIMENSION);
+        for (i = 0; i < this.board.DIMENSION; ++i) {
+            this.state[i] = new Array(this.board.DIMENSION);
             for (j = 0; j < this.board.DIMENSION; ++j) {
-                this.myState[i][j] = new Array(8);
+                this.state[i][j] = new Array(8);
                 for (k = 0; k < 8; ++k) {
-                    this.myState[i][j][k] = new Array(2);
-                    this.myState[i][j][k][0] = this.myState[i][j][k][1] = -1;
+                    this.state[i][j][k] = new Array(2);
+                    this.state[i][j][k][0] = this.state[i][j][k][1] = -1;
+                }
+            }
+        }
+
+        for (i = 0; i < this.board.DIMENSION; ++i) {
+            this.bounded[i] = new Array(this.board.DIMENSION);
+            for (j = 0; j < this.board.DIMENSION; ++j) {
+                this.bounded[i][j] = new Array(8);
+                for (k = 0; k < 8; ++k) {
+                    this.bounded[i][j][k] = new Array(2);
+                    this.bounded[i][j][k][0] = this.bounded[i][j][k][1] = 0;
                 }
             }
         }
@@ -209,7 +221,8 @@ Player.prototype = {
            for (i = 0; i < this.board.DIMENSION; ++i) {
             for (j = 0; j < this.board.DIMENSION; ++j) {
                 for (k = 0; k < 8; ++k) {
-                    this.myState[i][j][k][0] = this.myState[i][j][k][1] = -1;
+                    this.state[i][j][k][0] = this.state[i][j][k][1] = -1;
+                    this.bounded[i][j][k][0] = this.bounded[i][j][k][1] = 0;
                 }
             }
         }
@@ -255,6 +268,7 @@ Player.prototype = {
         // Consequtive pieces with same color / opponent color
         var curX = 0;
         var curY = 0;
+        var count = 0;
         for (i = 0; i < this.board.DIMENSION; ++i) {
             for (j = 0; j < this.board.DIMENSION; ++j) {
                 if (this.board.matrix[i][j] != this.board.UNOCCUPIED) {
@@ -269,18 +283,18 @@ Player.prototype = {
                     for (n = 0; n < 5; ++n) {
                         curX += stepX[k];
                         curY += stepY[k];
-                        if (curX < 0
-                                || curX >= this.board.DIMENSION
-                                || curY < 0
-                                || curY >= this.board.DIMENSION) {
+                        if (curX < 0 || curX >= this.board.DIMENSION
+                                || curY < 0 || curY >= this.board.DIMENSION
+                                || this.board.matrix[curX][curY] == opponentColor) {
+                            this.bounded[i][j][k][this.color] = 1;
                             break;
                         }
-                        if (this.board.matrix[curX][curY] != this.color) {
+                        else if (this.board.matrix[curX][curY] == this.board.UNOCCUPIED) {
                             break;
                         }
                         count++;
                     }
-                    this.myState[i][j][k][this.color] = count;
+                    this.state[i][j][k][this.color] = count;
 
                     // opponent color
                     curX = i;
@@ -289,30 +303,25 @@ Player.prototype = {
                     for (n = 0; n < 5; ++n) {
                         curX += stepX[k];
                         curY += stepY[k];
-                        if (curX < 0
-                                || curX >= this.board.DIMENSION
-                                || curY < 0
-                                || curY >= this.board.DIMENSION) {
+                        if (curX < 0 || curX >= this.board.DIMENSION
+                                || curY < 0 || curY >= this.board.DIMENSION
+                                || this.board.matrix[curX][curY] == this.color) {
+                            this.bounded[i][j][k][opponentColor] = 1;
                             break;
                         }
-                        if (this.board.matrix[curX][curY] == this.board.UNOCCUPIED) {
-                            break;
-                        }
-                        else if (this.board.matrix[curX][curY] == this.color) {
-                            if (count <= 2) {
-                                count = 0;
-                            }
+                        else if (this.board.matrix[curX][curY] == this.board.UNOCCUPIED) {
                             break;
                         }
                         count++;
                     }
-                    this.myState[i][j][k][opponentColor] = count;
+                    this.state[i][j][k][opponentColor] = count;
                 }
             }
         }
 
         // Score
         var score = 0;
+        var bound = 0;
         for (i = 0; i < this.board.DIMENSION; ++i) {
             for (j = 0; j < this.board.DIMENSION; ++j) {
                 if (this.board.matrix[i][j] != this.board.UNOCCUPIED) {
@@ -320,41 +329,23 @@ Player.prototype = {
                 }
 
                 score = 0;
+                bound = 0;
                 for (k = 0; k < 4; ++k) {
-                    count = this.myState[i][j][k][this.color];
-                                + this.myState[i][j][k + 4][this.color];
+                    count = this.state[i][j][k][this.color]
+                                + this.state[i][j][k + 4][this.color];
+                    bound = this.bounded[i][j][k][this.color]
+                                + this.bounded[i][j][k + 4][this.color];
+
                     if (count >= 4) {
-                        score += 10000;
+                        if (bound > 0) {
+                            score += 5000;
+                        }
+                        else {
+                            score += 10000;
+                        }
                     }
                     else if (count == 3) {
-                        if (i == 0 || i == this.board.DIMENSION - 1
-                            || j == 0 || j == this.board.DIMENSION - 1) {
-                        score += 500;
-                    }
-                    else {
-                        score += 1000;
-                    }
-                }
-                    else if (count == 2) {
-                        score += 100;
-                    }
-                    else if (count == 1) {
-                        score += 10;
-                    }
-                }
-
-                this.score[i][j][this.color] = score;
-
-                score = 0;
-                for (k = 0; k < 4; ++k) {
-                    count = this.myState[i][j][k][opponentColor]
-                                + this.myState[i][j][k + 4][opponentColor];
-                    if (count >= 4) {
-                        score += 10000;
-                    }
-                    else if (count == 3) {
-                        if (i == 0 || i == this.board.DIMENSION - 1
-                                || j == 0 || j == this.board.DIMENSION - 1) {
+                        if (bound > 0) {
                             score += 500;
                         }
                         else {
@@ -362,10 +353,62 @@ Player.prototype = {
                         }
                     }
                     else if (count == 2) {
-                        score += 100;
+                        if (bound > 0) {
+                            score += 50;
+                        }
+                        else {
+                            score += 500;
+                        }
                     }
                     else if (count == 1) {
-                        score += 10;
+                        if (bound > 0) {
+                            score += 5;
+                        }
+                        else {
+                            score += 200;
+                        }
+                    }
+                }
+                this.score[i][j][this.color] = score;
+
+                score = 0;
+                bound = 0;
+                for (k = 0; k < 4; ++k) {
+                    count = this.state[i][j][k][opponentColor]
+                                + this.state[i][j][k + 4][opponentColor];
+                    bound = this.bounded[i][j][k][opponentColor]
+                                + this.bounded[i][j][k + 4][opponentColor];
+                    if (count >= 4) {
+                        if (bound > 0) {
+                            score += 5000;
+                        }
+                        else {
+                            score += 10000;
+                        }
+                    }
+                    else if (count == 3) {
+                        if (bound > 0) {
+                            score += 500;
+                        }
+                        else {
+                            score += 1000;
+                        }
+                    }
+                    else if (count == 2) {
+                        if (bound > 0) {
+                            score += 50;
+                        }
+                        else {
+                            score += 500;
+                        }
+                    }
+                    else if (count == 1) {
+                        if (bound > 0) {
+                            score += 5;
+                        }
+                        else {
+                            score += 200;
+                        }
                     }
                 }
 
@@ -414,7 +457,7 @@ Player.prototype = {
                             + ','
                             + defensivePoint.y
                             + ']');
-        if (offensiveScore > defensiveScore) {
+        if (offensiveScore >= defensiveScore) {
             msgBox.appendMessage('Selecting offensive point');
             return offensivePoint;
         }

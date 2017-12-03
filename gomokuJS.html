@@ -19,7 +19,7 @@
                 You: Black<br/>
                 Machine: White<br/>
                 Move: Up, Down, Left, Right<br/>
-                Draw: Space<br/>
+                Put: Space<br/>
                 Replay: Refresh the page<br/>
             </span>
         </div>
@@ -38,7 +38,12 @@ function win(player, reason)
 {
     // window.alert(dir == 0 ? 'Black wins' : 'White wins');
     var span = document.querySelector('#gameover');
-    span.textContent = player + ' wins';
+    if (player === "man") {
+        span.textContent = 'You win';
+    }
+    else {
+        span.textContent = 'Machine wins';
+    }
     span.style.display = 'inline';
     span.style.position = 'absolute';
     span.style.left = span.parentElement.offsetWidth / 3 + 'px';
