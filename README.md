@@ -1,5 +1,5 @@
 # gomokuJS
-Javascript Gomoku with FC/NES game looking
+Javascript Gomoku game with FC/NES game looking
 
 ![game-snapshot](https://img3.doubanio.com/view/photo/l/public/p2504145182.webp "gomokuJS")
 
