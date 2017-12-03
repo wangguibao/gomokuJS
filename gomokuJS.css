@@ -16,7 +16,14 @@ body {
     position: absolute;
     left: 100px;
 }
-
+#panel {
+    float: right;
+    font-family: "Comic Sans MS", cursive, sans-serif;
+    font-size: normal;
+    color: #F0F0F0;
+    padding-right: 5px;
+    z-index: 1;
+}
 #pointer {
     position: absolute;
     bottom: 3px;
