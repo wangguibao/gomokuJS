@@ -32,3 +32,9 @@ body {
     background-color: #000000;
     z-index: 1;
 }
+#debugmsg {
+    position: absolute;
+    font-size: xx-small;
+    font-style: bold;
+    color: #80F000;
+}
