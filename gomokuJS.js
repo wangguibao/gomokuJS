@@ -295,7 +295,13 @@ Player.prototype = {
                                 || curY >= this.board.DIMENSION) {
                             break;
                         }
-                        if (this.board.matrix[curX][curY] != opponentColor) {
+                        if (this.board.matrix[curX][curY] == this.board.UNOCCUPIED) {
+                            break;
+                        }
+                        else if (this.board.matrix[curX][curY] == this.color) {
+                            if (count <= 2) {
+                                count = 0;
+                            }
                             break;
                         }
                         count++;
@@ -315,14 +321,20 @@ Player.prototype = {
 
                 score = 0;
                 for (k = 0; k < 4; ++k) {
-                    count = this.myState[i][j][k][this.color]
+                    count = this.myState[i][j][k][this.color];
                                 + this.myState[i][j][k + 4][this.color];
                     if (count >= 4) {
                         score += 10000;
                     }
                     else if (count == 3) {
+                        if (i == 0 || i == this.board.DIMENSION - 1
+                            || j == 0 || j == this.board.DIMENSION - 1) {
+                        score += 500;
+                    }
+                    else {
                         score += 1000;
                     }
+                }
                     else if (count == 2) {
                         score += 100;
                     }
@@ -341,7 +353,13 @@ Player.prototype = {
                         score += 10000;
                     }
                     else if (count == 3) {
-                        score += 1000;
+                        if (i == 0 || i == this.board.DIMENSION - 1
+                                || j == 0 || j == this.board.DIMENSION - 1) {
+                            score += 500;
+                        }
+                        else {
+                            score += 1000;
+                        }
                     }
                     else if (count == 2) {
                         score += 100;

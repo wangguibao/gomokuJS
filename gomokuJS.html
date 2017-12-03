@@ -3,6 +3,7 @@
 <head>
     <title>Gomoku (since 2017)</title>
     <link rel="stylesheet" type="text/css" href="gomokuJS.css"/>
+    <script type="text/javascript" src="util.js"></script>
     <script type="text/javascript" src="gomokuJS.js"></script>
 </head>
 <body>
@@ -13,8 +14,12 @@
             <img id='pointer' src='images/pointer.png'></img>
             <span id='gameover'></span>
         </div>
+        <div id="debug">
+            <span id="debugmsg"></span>
+        </div>
     </div>
 <script>
+var msgBox = new MessageBox();
 var board = new Board();
 var COLOR = GLOBAL.color.BLACK;
 var man = new Player('man');
@@ -101,6 +106,8 @@ function handleKeyPress(key)
         }
 
         var point = machine.defensiveMoveLevel1();
+        pointer.style.left = point.x * 32 + 3 + 'px';
+        pointer.style.bottom = point.y * 32 + 5 + 'px';
         ret = board.judge(machine.color, point.x, point.y);
         if (ret == GLOBAL.boardStatus.WIN) {
             win(machine.name);
