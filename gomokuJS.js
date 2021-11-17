@@ -53,7 +53,7 @@ Board.prototype = {
         this.matrix[x][y] = color;
         return 0;
     },
-	judge: function(color, x, y) {
+    judge: function(color, x, y) {
         if (x >= 15 || y >= 15) {
             window.alert('Invalid x or y axis:' + x + ' ' + y);
             return GLOBAL.boardStatus.PARAM_ERROR;
